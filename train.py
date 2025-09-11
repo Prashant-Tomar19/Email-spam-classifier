@@ -1,27 +1,22 @@
-import pandas as pd
 import pickle
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.pipeline import Pipeline
 
-# 1. Load dataset
-df = pd.read_csv("spam.csv")   # adjust if your file has a different name
+# Example training data
+X = ["Win money now", "Hello friend", "Free prize!!!", "Meeting tomorrow"]
+y = [1, 0, 1, 0]  # 1 = spam, 0 = ham
 
-# 2. Split data
-X = df["message"]
-y = df["label"].map({"ham": 0, "spam": 1})   # convert to 0/1
+# Vectorizer + Model
+vectorizer = CountVectorizer()
+X_vec = vectorizer.fit_transform(X)
 
-# 3. Create pipeline
-model = Pipeline([
-    ('tfidf', TfidfVectorizer(stop_words='english')),
-    ('nb', MultinomialNB())
-])
+model = MultinomialNB()
+model.fit(X_vec, y)
 
-# 4. Train
-model.fit(X, y)
-
-# 5. Save pipeline
+# Save both model & vectorizer
 with open("model.pkl", "wb") as f:
     pickle.dump(model, f)
 
-print("✅ Model trained and saved as model.pkl")
+with open("vectorizer.pkl", "wb") as f:
+    pickle.dump(vectorizer, f)
+
